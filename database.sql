@@ -130,3 +130,75 @@ VALUES
 (1, GETDATE(), 'Grocery Store', 50.00),
 (1, GETDATE(), 'Gas Station', 30.00),
 (2, GETDATE(), 'Online Purchase', 100.00);
+
+-- Datos de prueba 2
+INSERT INTO CreditCards (CardNumber, FirstName, LastName, CurrentBalance, CreditLimit)
+VALUES ('1234567812345678', 'Juan', 'Perez', 1000.00, 5000.00),
+       ('2345678923456789', 'Maria', 'Gomez', 2000.00, 6000.00);
+
+INSERT INTO Purchases (CreditCardId, PurchaseDate, Description, Amount)
+VALUES (1, GETDATE(), 'Compra en tienda A', 150.00),
+       (1, GETDATE(), 'Compra en tienda B', 200.00),
+       (2, GETDATE(), 'Compra en tienda C', 300.00);
+
+INSERT INTO Payments (CreditCardId, PaymentDate, Amount)
+VALUES (1, GETDATE(), 100.00),
+       (2, GETDATE(), 200.00);
+
+INSERT INTO Transactions (CreditCardId, TransactionDate, Description, Amount)
+VALUES (1, GETDATE(), 'Compra en tienda A', 150.00),
+       (1, GETDATE(), 'Compra en tienda B', 200.00),
+       (2, GETDATE(), 'Compra en tienda C', 300.00),
+       (1, GETDATE(), 'Pago realizado', -100.00),
+       (2, GETDATE(), 'Pago realizado', -200.00);
+
+
+-- Procedimientos almacenados 
+CREATE PROCEDURE sp_GetCreditCardDetails
+    @CreditCardId INT
+AS
+BEGIN
+    SELECT * FROM CreditCards WHERE CreditCardId = @CreditCardId;
+END;
+
+CREATE PROCEDURE sp_GetPurchases
+    @CreditCardId INT
+AS
+BEGIN
+    SELECT * FROM Purchases WHERE CreditCardId = @CreditCardId;
+END;
+
+CREATE PROCEDURE sp_GetPayments
+    @CreditCardId INT
+AS
+BEGIN
+    SELECT * FROM Payments WHERE CreditCardId = @CreditCardId;
+END;
+
+CREATE PROCEDURE sp_GetTransactions
+    @CreditCardId INT
+AS
+BEGIN
+    SELECT * FROM Transactions WHERE CreditCardId = @CreditCardId ORDER BY TransactionDate DESC;
+END;
+
+CREATE PROCEDURE sp_InsertPurchase
+    @CreditCardId INT,
+    @PurchaseDate DATETIME,
+    @Description NVARCHAR(200),
+    @Amount DECIMAL(18, 2)
+AS
+BEGIN
+    INSERT INTO Purchases (CreditCardId, PurchaseDate, Description, Amount)
+    VALUES (@CreditCardId, @PurchaseDate, @Description, @Amount);
+END;
+
+CREATE PROCEDURE sp_InsertPayment
+    @CreditCardId INT,
+    @PaymentDate DATETIME,
+    @Amount DECIMAL(18, 2)
+AS
+BEGIN
+    INSERT INTO Payments (CreditCardId, PaymentDate, Amount)
+    VALUES (@CreditCardId, @PaymentDate, @Amount);
+END;
