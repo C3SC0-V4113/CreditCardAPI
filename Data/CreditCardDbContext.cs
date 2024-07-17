@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CreditCardAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace CreditCardAPI.Models
+namespace CreditCardAPI.Data
 {
     public class CreditCardDbContext : DbContext
     {
@@ -9,8 +10,9 @@ namespace CreditCardAPI.Models
         {
         }
 
-        public DbSet<CardHolder> CardHolders { get; set; }
         public DbSet<CreditCard> CreditCards { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<Payment> Payments { get; set; }
     }
 }
