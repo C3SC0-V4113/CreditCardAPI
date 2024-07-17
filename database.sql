@@ -7,7 +7,7 @@ USE CreditCardDB;
 GO
 
 -- Creación de la tabla CreditCard
-CREATE TABLE CreditCard (
+CREATE TABLE CreditCards (
     CreditCardId INT IDENTITY(1,1) PRIMARY KEY,
     CardNumber VARCHAR(16) NOT NULL,
     FirstName VARCHAR(100) NOT NULL,
@@ -17,32 +17,32 @@ CREATE TABLE CreditCard (
 );
 
 -- Creación de la tabla Transaction
-CREATE TABLE [Transaction] (
+CREATE TABLE [Transactions] (
     TransactionId INT IDENTITY(1,1) PRIMARY KEY,
     CreditCardId INT NOT NULL,
     TransactionDate DATE NOT NULL,
     Description VARCHAR(255),
     Amount DECIMAL(18, 2) NOT NULL,
-    FOREIGN KEY (CreditCardId) REFERENCES CreditCard(CreditCardId)
+    FOREIGN KEY (CreditCardId) REFERENCES CreditCards(CreditCardId)
 );
 
 -- Creación de la tabla Purchase
-CREATE TABLE Purchase (
+CREATE TABLE Purchases (
     PurchaseId INT IDENTITY(1,1) PRIMARY KEY,
     CreditCardId INT NOT NULL,
     PurchaseDate DATE NOT NULL,
     Description VARCHAR(255),
     Amount DECIMAL(18, 2) NOT NULL,
-    FOREIGN KEY (CreditCardId) REFERENCES CreditCard(CreditCardId)
+    FOREIGN KEY (CreditCardId) REFERENCES CreditCards(CreditCardId)
 );
 
 -- Creación de la tabla Payment
-CREATE TABLE Payment (
+CREATE TABLE Payments (
     PaymentId INT IDENTITY(1,1) PRIMARY KEY,
     CreditCardId INT NOT NULL,
     PaymentDate DATE NOT NULL,
     Amount DECIMAL(18, 2) NOT NULL,
-    FOREIGN KEY (CreditCardId) REFERENCES CreditCard(CreditCardId)
+    FOREIGN KEY (CreditCardId) REFERENCES CreditCards(CreditCardId)
 );
 
 -- Procedimientos almacenados
@@ -65,9 +65,9 @@ BEGIN
         cc.CurrentBalance AS TotalAmountDue,
         cc.CurrentBalance AS TotalAmountWithInterest
     FROM 
-        CreditCard cc
+        CreditCards cc
     LEFT JOIN 
-        [Transaction] t ON cc.CreditCardId = t.CreditCardId
+        [Transactions] t ON cc.CreditCardId = t.CreditCardId
     WHERE 
         cc.CreditCardId = @CreditCardId
     GROUP BY 
@@ -82,7 +82,7 @@ CREATE PROCEDURE spAddPurchase
     @Amount DECIMAL(18, 2)
 AS
 BEGIN
-    INSERT INTO Purchase (CreditCardId, PurchaseDate, Description, Amount)
+    INSERT INTO Purchases (CreditCardId, PurchaseDate, Description, Amount)
     VALUES (@CreditCardId, @PurchaseDate, @Description, @Amount);
 END;
 
@@ -93,10 +93,10 @@ CREATE PROCEDURE spAddPayment
     @Amount DECIMAL(18, 2)
 AS
 BEGIN
-    INSERT INTO Payment (CreditCardId, PaymentDate, Amount)
+    INSERT INTO Payments (CreditCardId, PaymentDate, Amount)
     VALUES (@CreditCardId, @PaymentDate, @Amount);
 
-    UPDATE CreditCard
+    UPDATE CreditCards
     SET CurrentBalance = CurrentBalance - @Amount
     WHERE CreditCardId = @CreditCardId;
 END;
@@ -112,7 +112,7 @@ BEGIN
         t.Description,
         t.Amount
     FROM 
-        [Transaction] t
+        [Transactions] t
     WHERE 
         t.CreditCardId = @CreditCardId
     ORDER BY 
@@ -120,12 +120,12 @@ BEGIN
 END;
 
 -- Insertar datos de prueba
-INSERT INTO CreditCard (CardNumber, FirstName, LastName, CurrentBalance, CreditLimit)
+INSERT INTO CreditCards (CardNumber, FirstName, LastName, CurrentBalance, CreditLimit)
 VALUES 
 ('1234567812345678', 'John', 'Doe', 500.00, 1000.00),
 ('2345678923456789', 'Jane', 'Smith', 300.00, 1500.00);
 
-INSERT INTO [Transaction] (CreditCardId, TransactionDate, Description, Amount)
+INSERT INTO [Transactions] (CreditCardId, TransactionDate, Description, Amount)
 VALUES 
 (1, GETDATE(), 'Grocery Store', 50.00),
 (1, GETDATE(), 'Gas Station', 30.00),
