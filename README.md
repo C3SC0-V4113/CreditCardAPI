@@ -44,3 +44,8 @@ Si usas autenticación con Windows cambiala por esto
 dotnet restore
 dotnet run
 ```
+
+## Opcional
+Swagger está instalado en la solución, se abre automaticamente al ejecutar el porgrama en la ruta
+
+https://localhost:7167/swagger/index.html
