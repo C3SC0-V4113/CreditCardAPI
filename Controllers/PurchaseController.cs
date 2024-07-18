@@ -40,7 +40,7 @@ namespace CreditCardAPI.Controllers
             _context.Purchases.Add(purchase);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetPurchase), new { id = purchase.PurchaseId }, purchase);
+            return CreatedAtAction(nameof(PostPurchase), new { id = purchase.PurchaseId }, purchase);
         }
     }
 }

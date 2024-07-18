@@ -48,7 +48,7 @@ namespace CreditCardAPI.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return CreatedAtAction(nameof(GetPayment), new { id = payment.PaymentId }, payment);
+            return CreatedAtAction(nameof(PostPayment), new { id = payment.PaymentId }, payment);
         }
     }
 }

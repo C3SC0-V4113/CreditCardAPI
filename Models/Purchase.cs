@@ -7,7 +7,5 @@
         public DateTime PurchaseDate { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
-
-        public CreditCard CreditCard { get; set; }
     }
 }

@@ -14,5 +14,17 @@ namespace CreditCardAPI.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<Payment> Payments { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CreditCard>()
+                .HasKey(c => c.CreditCardId);
+
+            modelBuilder.Entity<Purchase>()
+                .HasKey(p => p.PurchaseId);
+
+            modelBuilder.Entity<Payment>()
+                .HasKey(p => p.PaymentId);
+        }
     }
 }

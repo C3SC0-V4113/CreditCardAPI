@@ -23,10 +23,12 @@ namespace CreditCardAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Transaction>> GetTransaction(int id)
+        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction(int id)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
-            if (transaction == null)
+            var transaction = await _context.Transactions.Where(t => t.CreditCardId == id)
+                                         .OrderByDescending(t => t.TransactionDate)
+                                         .ToListAsync();
+            if (transaction == null || !transaction.Any())
             {
                 return NotFound();
             }

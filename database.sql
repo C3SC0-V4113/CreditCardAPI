@@ -161,12 +161,6 @@ BEGIN
     SELECT * FROM CreditCards WHERE CreditCardId = @CreditCardId;
 END;
 
-CREATE PROCEDURE sp_GetPurchases
-    @CreditCardId INT
-AS
-BEGIN
-    SELECT * FROM Purchases WHERE CreditCardId = @CreditCardId;
-END;
 
 CREATE PROCEDURE sp_GetPayments
     @CreditCardId INT
@@ -201,4 +195,51 @@ AS
 BEGIN
     INSERT INTO Payments (CreditCardId, PaymentDate, Amount)
     VALUES (@CreditCardId, @PaymentDate, @Amount);
+END;
+
+-- Procedimiento para obtener compras
+CREATE PROCEDURE sp_GetPurchases
+    @CreditCardId INT
+AS
+BEGIN
+    SELECT * FROM Purchases WHERE CreditCardId = @CreditCardId ORDER BY PurchaseDate DESC;
+END;
+
+-- Procedimiento para obtener el total de compras del mes actual
+CREATE PROCEDURE sp_GetTotalCurrentMonth
+    @CreditCardId INT
+AS
+BEGIN
+    SELECT SUM(Amount) AS TotalCurrentMonth
+    FROM Purchases
+    WHERE CreditCardId = @CreditCardId AND
+          MONTH(PurchaseDate) = MONTH(GETDATE()) AND
+          YEAR(PurchaseDate) = YEAR(GETDATE());
+END;
+
+-- Procedimiento para obtener el total de compras del mes anterior
+CREATE PROCEDURE sp_GetTotalPreviousMonth
+    @CreditCardId INT
+AS
+BEGIN
+    SELECT SUM(Amount) AS TotalPreviousMonth
+    FROM Purchases
+    WHERE CreditCardId = @CreditCardId AND
+          MONTH(PurchaseDate) = MONTH(DATEADD(MONTH, -1, GETDATE())) AND
+          YEAR(PurchaseDate) = YEAR(DATEADD(MONTH, -1, GETDATE()));
+END;
+
+-- Procedimiento para obtener el estado de cuenta
+CREATE PROCEDURE sp_GetStatement
+    @CreditCardId INT
+AS
+BEGIN
+    SELECT c.FirstName, c.LastName, c.CardNumber, c.CurrentBalance, c.CreditLimit
+    FROM CreditCards c
+    WHERE c.CreditCardId = @CreditCardId;
+
+    SELECT p.PurchaseId, p.PurchaseDate, p.Description, p.Amount
+    FROM Purchases p
+    WHERE p.CreditCardId = @CreditCardId
+    ORDER BY p.PurchaseDate DESC;
 END;
