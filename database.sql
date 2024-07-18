@@ -16,16 +16,6 @@ CREATE TABLE CreditCards (
     CreditLimit DECIMAL(18, 2) NOT NULL
 );
 
--- Creación de la tabla Transaction
-CREATE TABLE [Transactions] (
-    TransactionId INT IDENTITY(1,1) PRIMARY KEY,
-    CreditCardId INT NOT NULL,
-    TransactionDate DATE NOT NULL,
-    Description VARCHAR(255),
-    Amount DECIMAL(18, 2) NOT NULL,
-    FOREIGN KEY (CreditCardId) REFERENCES CreditCards(CreditCardId)
-);
-
 -- Creación de la tabla Purchase
 CREATE TABLE Purchases (
     PurchaseId INT IDENTITY(1,1) PRIMARY KEY,
@@ -46,34 +36,6 @@ CREATE TABLE Payments (
 );
 
 -- Procedimientos almacenados
--- Obtener estado de cuenta
-CREATE PROCEDURE spGetCreditCardStatement
-    @CreditCardId INT
-AS
-BEGIN
-    SELECT 
-        cc.CreditCardId,
-        cc.CardNumber,
-        cc.FirstName,
-        cc.LastName,
-        cc.CurrentBalance,
-        cc.CreditLimit,
-        ISNULL(SUM(t.Amount), 0) AS TotalPurchasesCurrentMonth,
-        ISNULL(SUM(t.Amount), 0) AS TotalPurchasesLastMonth,
-        0 AS InterestBonificable,
-        0 AS MinimumPayment,
-        cc.CurrentBalance AS TotalAmountDue,
-        cc.CurrentBalance AS TotalAmountWithInterest
-    FROM 
-        CreditCards cc
-    LEFT JOIN 
-        [Transactions] t ON cc.CreditCardId = t.CreditCardId
-    WHERE 
-        cc.CreditCardId = @CreditCardId
-    GROUP BY 
-        cc.CreditCardId, cc.CardNumber, cc.FirstName, cc.LastName, cc.CurrentBalance, cc.CreditLimit
-END;
-
 -- Registrar una compra
 CREATE PROCEDURE spAddPurchase
     @CreditCardId INT,
@@ -99,24 +61,6 @@ BEGIN
     UPDATE CreditCards
     SET CurrentBalance = CurrentBalance - @Amount
     WHERE CreditCardId = @CreditCardId;
-END;
-
--- Obtener historial de transacciones
-CREATE PROCEDURE spGetTransactions
-    @CreditCardId INT
-AS
-BEGIN
-    SELECT 
-        t.TransactionId,
-        t.TransactionDate,
-        t.Description,
-        t.Amount
-    FROM 
-        [Transactions] t
-    WHERE 
-        t.CreditCardId = @CreditCardId
-    ORDER BY 
-        t.TransactionDate DESC;
 END;
 
 -- Insertar datos de prueba
@@ -167,13 +111,6 @@ CREATE PROCEDURE sp_GetPayments
 AS
 BEGIN
     SELECT * FROM Payments WHERE CreditCardId = @CreditCardId;
-END;
-
-CREATE PROCEDURE sp_GetTransactions
-    @CreditCardId INT
-AS
-BEGIN
-    SELECT * FROM Transactions WHERE CreditCardId = @CreditCardId ORDER BY TransactionDate DESC;
 END;
 
 CREATE PROCEDURE sp_InsertPurchase

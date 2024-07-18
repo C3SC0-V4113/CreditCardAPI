@@ -16,33 +16,51 @@ namespace CreditCardAPI.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
+        [HttpGet("{creditCardId}")]
+        public async Task<IActionResult> GetTransactions(int creditCardId)
         {
-            return await _context.Transactions.ToListAsync();
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction(int id)
-        {
-            var transaction = await _context.Transactions.Where(t => t.CreditCardId == id)
-                                         .OrderByDescending(t => t.TransactionDate)
-                                         .ToListAsync();
-            if (transaction == null || !transaction.Any())
+            var creditCard = await _context.CreditCards.FindAsync(creditCardId);
+            if (creditCard == null)
             {
                 return NotFound();
             }
 
-            return transaction;
+            var purchases = await _context.Purchases
+                .Where(p => p.CreditCardId == creditCardId)
+                .Select(p => new Transaction
+                {
+                    TransactionDate = p.PurchaseDate,
+                    Description = p.Description,
+                    Charge = p.Amount,
+                    Credit = null
+                })
+                .ToListAsync();
+
+            var payments = await _context.Payments
+                .Where(p => p.CreditCardId == creditCardId)
+                .Select(p => new Transaction
+                {
+                    TransactionDate = p.PaymentDate,
+                    Description = "Pago TC",
+                    Charge = null,
+                    Credit = p.Amount
+                })
+                .ToListAsync();
+
+            var transactions = purchases.Concat(payments)
+                .OrderByDescending(t => t.TransactionDate)
+                .ToList();
+
+            return Ok(transactions);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
-        {
-            _context.Transactions.Add(transaction);
-            await _context.SaveChangesAsync();
+        //[HttpPost]
+        //public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
+        //{
+        //    _context.Transactions.Add(transaction);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTransaction), new { id = transaction.TransactionId }, transaction);
-        }
+        //    return CreatedAtAction(nameof(GetTransaction), new { id = transaction.TransactionId }, transaction);
+        //}
     }
 }

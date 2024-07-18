@@ -29,6 +29,22 @@ namespace CreditCardAPI.Controllers
                 .Where(p => p.CreditCardId == creditCardId)
                 .ToListAsync();
 
+            var currentMonthPurchases = purchases
+    .Where(p => p.PurchaseDate.Month == System.DateTime.Now.Month && p.PurchaseDate.Year == System.DateTime.Now.Year)
+    .Sum(p => p.Amount);
+
+            var previousMonthPurchases = purchases
+                .Where(p => p.PurchaseDate.Month == System.DateTime.Now.AddMonths(-1).Month && p.PurchaseDate.Year == System.DateTime.Now.AddMonths(-1).Year)
+                .Sum(p => p.Amount);
+
+            // Configurable interest and minimum payment percentages
+            decimal interestRate = 0.25M;  // 25%
+            decimal minimumPaymentRate = 0.05M;  // 5%
+
+            var BonificableInterest = creditCard.CurrentBalance * interestRate;
+            var AvailableBalance = creditCard.CreditLimit - creditCard.CurrentBalance;
+            var MinimumPayment = creditCard.CurrentBalance * minimumPaymentRate;
+
             var statement = new
             {
                 creditCard.FirstName,
@@ -36,7 +52,12 @@ namespace CreditCardAPI.Controllers
                 creditCard.CardNumber,
                 creditCard.CurrentBalance,
                 creditCard.CreditLimit,
-                Purchases = purchases
+                AvailableBalance= AvailableBalance,
+                BonificableInterest= BonificableInterest,
+                MinimumPayment= MinimumPayment,
+                Purchases = purchases,
+                currentMonthTotal= currentMonthPurchases,
+                previousMonthTotal= previousMonthPurchases,
             };
 
             return Ok(statement);
