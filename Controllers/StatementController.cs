@@ -62,25 +62,5 @@ namespace CreditCardAPI.Controllers
 
             return Ok(statement);
         }
-
-        [HttpGet("{creditCardId}/current-month")]
-        public async Task<ActionResult<decimal>> GetCurrentMonthTotal(int creditCardId)
-        {
-            var currentMonthTotal = await _context.Purchases
-                .Where(p => p.CreditCardId == creditCardId && p.PurchaseDate.Month == DateTime.Now.Month && p.PurchaseDate.Year == DateTime.Now.Year)
-                .SumAsync(p => p.Amount);
-
-            return currentMonthTotal;
-        }
-
-        [HttpGet("{creditCardId}/previous-month")]
-        public async Task<ActionResult<decimal>> GetPreviousMonthTotal(int creditCardId)
-        {
-            var previousMonthTotal = await _context.Purchases
-                .Where(p => p.CreditCardId == creditCardId && p.PurchaseDate.Month == DateTime.Now.AddMonths(-1).Month && p.PurchaseDate.Year == DateTime.Now.Year)
-                .SumAsync(p => p.Amount);
-
-            return previousMonthTotal;
-        }
     }
 }

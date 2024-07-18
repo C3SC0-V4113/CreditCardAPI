@@ -16,24 +16,6 @@ namespace CreditCardAPI.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Purchase>>> GetPurchases()
-        {
-            return await _context.Purchases.ToListAsync();
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Purchase>> GetPurchase(int id)
-        {
-            var purchase = await _context.Purchases.FindAsync(id);
-            if (purchase == null)
-            {
-                return NotFound();
-            }
-
-            return purchase;
-        }
-
         [HttpPost]
         public async Task<ActionResult<Purchase>> PostPurchase(Purchase purchase)
         {

@@ -54,13 +54,5 @@ namespace CreditCardAPI.Controllers
             return Ok(transactions);
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
-        //{
-        //    _context.Transactions.Add(transaction);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction(nameof(GetTransaction), new { id = transaction.TransactionId }, transaction);
-        //}
     }
 }

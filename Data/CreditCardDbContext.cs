@@ -11,7 +11,6 @@ namespace CreditCardAPI.Data
         }
 
         public DbSet<CreditCard> CreditCards { get; set; }
-        //public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<Payment> Payments { get; set; }
 
